@@ -1,6 +1,6 @@
 package me.matamor.pruebas.blackjack.jugadores;
 
-import me.matamor.pruebas.blackjack.Juego;
+import me.matamor.pruebas.blackjack.Mesa;
 
 public class JugadorBot extends Jugador {
 
@@ -9,7 +9,7 @@ public class JugadorBot extends Jugador {
     }
 
     @Override
-    public void jugar(Juego juego) {
+    public void jugar(Mesa mesa) {
 
     }
 }

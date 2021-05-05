@@ -1,5 +1,7 @@
 package me.matamor.pruebas.blackjack;
 
+import java.util.Objects;
+
 public class Carta {
 
     private final Palo palo;
@@ -21,5 +23,23 @@ public class Carta {
     @Override
     public String toString() {
         return this.palo.getNombre() + ":" + this.tipo.getNombre();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Carta carta = (Carta) obj;
+        return this.palo == carta.palo && this.tipo == carta.tipo;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.palo, this.tipo);
     }
 }

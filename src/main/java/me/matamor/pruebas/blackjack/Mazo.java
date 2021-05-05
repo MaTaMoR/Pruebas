@@ -9,11 +9,11 @@ public class Mazo {
     private final List<Carta> cartas;
 
     public Mazo() {
-        this(new ArrayList<>());
+        this.cartas = new ArrayList<>();
     }
 
     public Mazo(List<Carta> cartas) {
-        this.cartas = cartas;
+        this.cartas = new ArrayList<>(cartas);
     }
 
     public List<Carta> getCartas() {
@@ -26,5 +26,9 @@ public class Mazo {
 
     public Carta sacarCarta() {
         return this.cartas.remove(0);
+    }
+
+    public void nuevaCarta(Carta carta) {
+        this.cartas.add(carta);
     }
 }

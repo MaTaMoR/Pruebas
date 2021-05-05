@@ -2,10 +2,10 @@ package me.matamor.pruebas.blackjack.jugadores;
 
 import me.matamor.pruebas.blackjack.Mesa;
 
-public class JugadorPersona extends Jugador {
+public class JugadorCPU extends Jugador {
 
-    public JugadorPersona(String nombre) {
-        super(nombre);
+    public JugadorCPU() {
+        super("CPU");
     }
 
     @Override

@@ -4,33 +4,28 @@ import java.util.Arrays;
 
 public class Baraja {
 
-    private final Carta[] cartas;
+    private static final Carta[] cartas;
 
-    public Baraja() {
+    static {
         Palo[] palos = Palo.values();
         Tipo[] tipos = Tipo.values();
 
-        this.cartas = new Carta[palos.length * tipos.length];
+        cartas = new Carta[palos.length * tipos.length];
 
         int contador = 0;
 
         for (Palo palo : palos) {
             for (Tipo tipo : tipos) {
-                this.cartas[contador++] = new Carta(palo, tipo);
+                cartas[contador++] = new Carta(palo, tipo);
             }
         }
     }
 
-    public Carta[] getCartas() {
-        return this.cartas.clone();
+    public static Carta[] getCartas() {
+        return cartas.clone();
     }
 
-    public Mazo crearMazo() {
-        return new Mazo(Arrays.asList(this.cartas));
-    }
-
-    public static void main(String[] args) {
-        Baraja baraja = new Baraja();
-        System.out.println(Arrays.toString(baraja.cartas));
+    public static Mazo nuevoMazo() {
+        return new Mazo(Arrays.asList(getCartas()));
     }
 }
