@@ -45,52 +45,64 @@ public class MenuJuego extends MenuConsola {
                 System.out.println("¿ Quieres que el jugador sea un bot ? ");
                 boolean bot = Input.leerPregunta();
 
-                String nombre;
+                Jugador jugador;
+
+                //Si el jugador es un bot tiene un nombre y apuesta predeterminado
                 if (bot) {
-                    nombre = "Bot - " + jugadores.size();
+                    jugador = new JugadorBot("Bot-" + jugadores.size());
+                    jugador.setApuesta(Constantes.APUESTA_DEFAULT);
                 } else {
+                    //Preguntamos el nombre del jugador
                     System.out.println("Introduce el nombre del jugador:");
-                    nombre = Input.leerLinea(Constantes.NAME_MIN, -1);
+                    String nombre = Input.leerLinea(Constantes.NAME_MIN, -1);
+
+                    System.out.printf("Introduce la apuesta del jugador (Apuesta minima: %d):\n", Constantes.APUESTA_DEFAULT);
+                    int apuesta = Input.leerInt(Constantes.APUESTA_DEFAULT, Constantes.SALDO_DEFAULT);
+
+                    jugador = new JugadorPersonaConsola(nombre);
+                    jugador.setApuesta(apuesta);
                 }
 
-                Jugador jugador = (bot ? new JugadorBot(nombre) : new JugadorPersonaConsola(nombre));
+                //Añadimos el jugador al listado de jugadores
                 jugadores.add(jugador);
 
                 System.out.println("Nuevo jugador registrado: " + jugador.getNombre());
 
+                //Preguntamos si quiere añadir un jugador más
                 System.out.println("¿ Quieres añadir otro jugador a la partida ?");
                 activo = Input.leerPregunta();
             } catch (CancelException e) {
                 System.out.println("Se ha cancelado añadir un nuevo jugador!");
             }
-        } while (activo);
+        } while (activo && jugadores.size() < Constantes.JUGADORES_MAXIMOS);
 
         return jugadores;
     }
 
     private void crearPartida() {
-        if (this.juego.isPartidaActiva()) {
+        if (this.juego.isPartidaActiva()) { //Comprobamos que no haya un partida ya activa, aunque en teoría no debería ser posible
             System.out.println("Ya hay una partida activa!");
-        } else {
+        } else { //Creamos una partida nueva
             System.out.println("==== CREACIÓN DE PARTIDA ====");
 
-            /* Aquí se guarda el listado de jugadores */
+            //Aquí se guarda el listado de jugadores
             List<Jugador> jugadores = new ArrayList<>();
 
-            /* Creamos el jugador principal y lo añadimos al listado de jugadores */
+            //Creamos el jugador principal y lo añadimos al listado de jugadores
             Jugador jugador = pedirJugador();
             jugadores.add(jugador);
 
-            /* Preguntamos si el jugador quiere añadir más jugadores */
-            System.out.println("¿ Quieres añadir un jugador a la partida ?");
+            //Preguntamos si el jugador quiere añadir más jugadores
+            System.out.println("¿ Quieres añadir más jugadores a la partida ?");
             boolean masJugadores = Input.leerPregunta();
 
-            /* Añadimos todos los jugadores que el jugador añada */
+            //Añadimos todos los jugadores que el jugador añada
             if (masJugadores) {
                 jugadores.addAll(pedirJugadores());
             }
 
             try {
+                //Creamos la mesa donde con los jugadores e iniciamos la partida
                 Mesa mesa = this.juego.crearPartida(jugadores);
                 mesa.iniciar();
             } catch (BlackJackException e) {
@@ -101,18 +113,18 @@ public class MenuJuego extends MenuConsola {
 
     private void mostrarEstadisticas() {
         Mesa mesa = this.juego.getMesa();
-        if (mesa == null) {
+        if (mesa == null) { //Comprobamos que haya una partida
             System.out.println("Todavía no se ha jugado ninguna partida!");
-        } else if (mesa.getEstadoMesa() != EstadoMesa.PARADA) {
+        } else if (mesa.getEstadoMesa() != EstadoMesa.PARADA) { //Comprobamos que la partida haya acabado
             System.out.println("La mesa actual todavía no ha acabado!");
-        } else {
+        } else { //Mostramos las estadisticas
             System.out.println("==== ESTADISTICAS DE ÚLTIMA PARTIDA ====");
             System.out.println("Total de manos: " + mesa.getManos());
             System.out.println("Jugadores: " + mesa.getJugadores().size());
             System.out.println("Manos ganada por CPU: " + mesa.getCpu().getManosGanadas());
 
             for (Jugador jugador : mesa.getJugadores()) {
-                System.out.printf("Manos ganadas por %s: %d\n", jugador.getNombre(), jugador.getManosGanadas());
+                System.out.printf("Manos ganadas por '%s': %d\n", jugador.getNombre(), jugador.getManosGanadas());
             }
         }
     }

@@ -5,17 +5,19 @@ import me.matamor.pruebas.test.tiempo.colores.ColorBuilder;
 
 public enum Palo implements Unicode {
 
-    TREBOL("Trebol", '\u2667'),
-    DIAMANTE("Diamante", '\u2662'),
-    CORAZON("Corazon", '\u2665'),
-    ESPADA("Espada", '\u2660');
+    TREBOL("Trebol", '\u2667', Color.VERDE),
+    DIAMANTE("Diamante", '\u2666', Color.AZUL),
+    CORAZON("Corazon", '\u2665', Color.ROJO),
+    ESPADA("Espada", '\u2660', Color.NEGRO);
 
     private final String nombre;
     private final char unicode;
+    private final Color color;
 
-    Palo(String nombre, char unicode) {
+    Palo(String nombre, char unicode, Color color) {
         this.nombre = nombre;
         this.unicode = unicode;
+        this.color = color;
     }
 
     public String getNombre() {
@@ -25,6 +27,10 @@ public enum Palo implements Unicode {
     @Override
     public char getUnicode() {
         return this.unicode;
+    }
+
+    public Color getColor() {
+        return this.color;
     }
 
     public static void main(String[] args) {

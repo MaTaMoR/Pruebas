@@ -7,8 +7,13 @@ public final class Constantes {
     }
 
     public static final int NAME_MIN = 3;
-    public static final int DEFAULT_BALANCE = 1000;
-    public static final int DEFAULT_BET = 1000;
+    public static final int SALDO_DEFAULT = 2500;
+    public static final int APUESTA_DEFAULT = 1000;
+    public static final int SALDO_CPU_DEFAULT = SALDO_DEFAULT * 2;
+    public static final int JUGADORES_MAXIMOS = 7;
+
+    public static final double CPU_MIN_SIN = 15;
+    public static final double CPU_MIN_MEJOR = 85;
 
     public static final long DELAY = 2000L;
 

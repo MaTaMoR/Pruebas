@@ -4,18 +4,30 @@ import me.matamor.pruebas.lib.Randomizer;
 
 public enum PersonalidadBot {
 
-    PASIVO(75),
-    NORMAL(60),
-    AGRESIVO(45);
+    PASIVO(70, 15, 85),
+    NORMAL(55, 20, 80),
+    AGRESIVO(40, 25, 75);
 
     private final double riesgo;
+    private final double minSin;
+    private final double minMejor;
 
-    PersonalidadBot(double riesgo) {
+    PersonalidadBot(double riesgo, double minSin, double minMejor) {
         this.riesgo = riesgo;
+        this.minSin = minSin;
+        this.minMejor = minMejor;
     }
 
     public double getRiesgo() {
         return this.riesgo;
+    }
+
+    public double getMinSin() {
+        return this.minSin;
+    }
+
+    public double getMinMejor() {
+        return this.minMejor;
     }
 
     public static PersonalidadBot aleatorio() {

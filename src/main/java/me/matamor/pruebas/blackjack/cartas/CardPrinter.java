@@ -2,6 +2,7 @@ package me.matamor.pruebas.blackjack.cartas;
 
 import me.matamor.pruebas.blackjack.cartas.Baraja;
 import me.matamor.pruebas.blackjack.cartas.Carta;
+import me.matamor.pruebas.test.tiempo.colores.ColorBuilder;
 
 public class CardPrinter {
 
@@ -45,14 +46,15 @@ public class CardPrinter {
 
     public static void print(Carta carta) {
         String tipo = carta.getTipo().getNombre();
+        ColorBuilder color = ColorBuilder.builder(carta.getPalo().getColor());
 
         String resultado = juntar(new String[] {
                 "┌───────┐",
-                "| c    |".replace("c", (tipo.length() == 2 ? tipo : tipo + " ")),
+                "| c    |".replace("c", color.build(tipo.length() == 2 ? tipo : tipo + " ")),
                 "|       |",
-                "|   p   |".replace("p", "" + carta.getPalo().getUnicode()),
+                "|   p   |".replace("p", color.build(carta.getPalo().getUnicode())),
                 "|       |",
-                "|    c |".replace("c", (tipo.length() == 2 ? tipo : " " + tipo)),
+                "|    c |".replace("c", color.build(tipo.length() == 2 ? tipo : " " + tipo)),
                 "└───────┘"
         });
 
@@ -60,8 +62,7 @@ public class CardPrinter {
     }
 
     public static void main(String[] args) {
-        Baraja baraja = new Baraja();
-        for (Carta carta : baraja.getCartas()) {
+        for (Carta carta : Baraja.getCartas()) {
             print(carta);
         }
 

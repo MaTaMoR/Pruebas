@@ -4,6 +4,8 @@ import me.matamor.pruebas.blackjack.jugadores.Jugador;
 import me.matamor.pruebas.blackjack.juego.packetmanager.handlers.*;
 import me.matamor.pruebas.blackjack.juego.packetmanager.packets.*;
 
+import java.util.Collection;
+
 public class ConsolePacketManager extends SimplePacketManager {
 
     public ConsolePacketManager() {
@@ -17,11 +19,12 @@ public class ConsolePacketManager extends SimplePacketManager {
         registerHandler(PlayerBetPacket.class, new PlayerBetPacketConsoleHandler());
         registerHandler(PlayerAskCardPacket.class, new PlayerAskCardPacketConsoleHandler());
         registerHandler(PlayerPointsPacket.class, new PlayerPointsPacketConsolaHandler());
+        registerHandler(PlayerDoubleBetPacket.class, new PlayerDoubleBetPacketConsoleHandler());
         registerHandler(GameStatePacket.class, new GameStatePacketConsoleHandler());
     }
 
     @Override
-    public void broadcast(Packet packet) throws PacketException {
+    public void broadcast(Collection<Jugador> jugadores, Packet packet) throws PacketException {
         handlePacket(packet);
     }
 
