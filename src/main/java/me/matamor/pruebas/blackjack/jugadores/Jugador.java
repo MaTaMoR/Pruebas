@@ -1,8 +1,8 @@
 package me.matamor.pruebas.blackjack.jugadores;
 
-import me.matamor.pruebas.blackjack.Constantes;
-import me.matamor.pruebas.blackjack.Mazo;
-import me.matamor.pruebas.blackjack.Mesa;
+import me.matamor.pruebas.blackjack.configuracion.Constantes;
+import me.matamor.pruebas.blackjack.cartas.Mazo;
+import me.matamor.pruebas.blackjack.juego.Mesa;
 
 public abstract class Jugador {
 
@@ -67,11 +67,21 @@ public abstract class Jugador {
         this.estado = estado;
     }
 
-    public abstract void jugar(Mesa mesa);
+    public abstract Respuesta jugar(Mesa mesa);
+
+    public enum Respuesta {
+
+        SALTAR,
+        PEDIR_CARTA
+
+    }
 
     public enum Estado {
 
+        PIERDE,
+        GANA,
         ACTIVO,
+        EMPATE,
         PLANTADO,
         FUERA
 

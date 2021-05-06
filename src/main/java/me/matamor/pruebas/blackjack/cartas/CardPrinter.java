@@ -1,4 +1,7 @@
-package me.matamor.pruebas.blackjack;
+package me.matamor.pruebas.blackjack.cartas;
+
+import me.matamor.pruebas.blackjack.cartas.Baraja;
+import me.matamor.pruebas.blackjack.cartas.Carta;
 
 public class CardPrinter {
 
@@ -34,7 +37,7 @@ public class CardPrinter {
     private static String juntar(String[] args) {
         StringBuilder stringBuilder = new StringBuilder();
         for (String arg : args) {
-            stringBuilder.append(arg);
+            stringBuilder.append(arg).append("\n");
         }
 
         return stringBuilder.toString();

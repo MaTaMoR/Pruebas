@@ -1,4 +1,4 @@
-package me.matamor.pruebas.blackjack;
+package me.matamor.pruebas.blackjack.cartas;
 
 import java.util.Objects;
 
@@ -7,9 +7,13 @@ public class Carta {
     private final Palo palo;
     private final Tipo tipo;
 
+    private boolean visisble;
+
     public Carta(Palo palo, Tipo tipo) {
         this.palo = palo;
         this.tipo = tipo;
+
+        this.visisble = true;
     }
 
     public Palo getPalo() {
@@ -20,11 +24,18 @@ public class Carta {
         return this.tipo;
     }
 
+    public boolean isVisisble() {
+        return this.visisble;
+    }
+
+    public void setVisible(boolean visisble) {
+        this.visisble = visisble;
+    }
+
     @Override
     public String toString() {
         return this.palo.getNombre() + ":" + this.tipo.getNombre();
     }
-
 
     @Override
     public boolean equals(Object obj) {

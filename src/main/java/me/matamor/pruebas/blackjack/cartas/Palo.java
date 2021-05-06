@@ -1,4 +1,4 @@
-package me.matamor.pruebas.blackjack;
+package me.matamor.pruebas.blackjack.cartas;
 
 import me.matamor.pruebas.test.tiempo.colores.Color;
 import me.matamor.pruebas.test.tiempo.colores.ColorBuilder;

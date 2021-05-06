@@ -1,4 +1,9 @@
-package me.matamor.pruebas.blackjack;
+package me.matamor.pruebas.blackjack.cartas;
+
+import me.matamor.pruebas.blackjack.cartas.Carta;
+import me.matamor.pruebas.blackjack.cartas.Mazo;
+import me.matamor.pruebas.blackjack.cartas.Palo;
+import me.matamor.pruebas.blackjack.cartas.Tipo;
 
 import java.util.Arrays;
 

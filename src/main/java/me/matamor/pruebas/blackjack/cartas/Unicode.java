@@ -1,4 +1,4 @@
-package me.matamor.pruebas.blackjack;
+package me.matamor.pruebas.blackjack.cartas;
 
 public interface Unicode {
 
