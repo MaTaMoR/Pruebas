@@ -11,7 +11,9 @@ public class PlayerTurnStartPacketConsoleHandler implements PacketHandler {
         if (packet instanceof PlayerTurnStartPacket) {
             PlayerTurnStartPacket turnStartPacket = (PlayerTurnStartPacket) packet;
 
+            System.out.println("--------------------------------");
             System.out.printf("Dando cartas al jugador '%s'!\n", turnStartPacket.getJugador().getNombre());
+            System.out.println("--------------------------------");
         }
     }
 }

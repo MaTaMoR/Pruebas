@@ -6,25 +6,27 @@ import me.matamor.pruebas.blackjack.juego.Mesa;
 
 public abstract class Jugador {
 
-    private final String nombre;
-    private final Mazo mazo;
+    protected final String nombre;
+    protected final Mazo mazo;
 
-    private int saldo;
-    private int apuesta;
+    protected int saldo;
+    protected int apuesta;
 
-    private int manosGanadas;
+    protected int manosGanadas;
 
-    private Estado estado;
+    protected Estado estado;
+    protected boolean doblarApuesta;
 
     public Jugador(String nombre) {
         this.nombre = nombre;
         this.mazo = new Mazo();
 
-        this.saldo = Constantes.DEFAULT_BALANCE;
-        this.apuesta = Constantes.DEFAULT_BET;
+        this.saldo = Constantes.SALDO_DEFAULT;
+        this.apuesta = Constantes.APUESTA_DEFAULT;
 
         this.manosGanadas = 0;
         this.estado = Estado.ACTIVO;
+        this.doblarApuesta = false;
     }
 
     public String getNombre() {
@@ -66,6 +68,16 @@ public abstract class Jugador {
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
+
+    public boolean isDoblarApuesta() {
+        return this.doblarApuesta;
+    }
+
+    public void setDoblarApuesta(boolean doblarApuesta) {
+        this.doblarApuesta = doblarApuesta;
+    }
+
+    public abstract boolean doblarApuesta(Mesa mesa);
 
     public abstract Respuesta jugar(Mesa mesa);
 

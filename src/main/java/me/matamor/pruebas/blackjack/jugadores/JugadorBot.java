@@ -24,6 +24,33 @@ public class JugadorBot extends Jugador {
         return this.personalidadBot;
     }
 
+    @Override
+    public boolean doblarApuesta(Mesa mesa) {
+        int puntuacion = this.mazo.contarPuntosReal();
+        int sinCartas = 0;
+        int mejorPuntuacion = 0;
+
+        List<Jugador> jugadores = mesa.getJugadores(Estado.ACTIVO);
+
+        for (Jugador jugador : jugadores) {
+            if (jugador.getMazo().getCartas().size() > 0) {
+                int puntuacionJugador = jugador.getMazo().contarPuntosReal();
+
+                if (puntuacion > puntuacionJugador) {
+                    mejorPuntuacion = mejorPuntuacion + 1;
+                }
+            } else {
+                sinCartas = sinCartas + 1;
+            }
+        }
+
+        double porcentajePuntuacion = (double) (puntuacion * 100) / jugadores.size();
+        double porcentajeCartas = (double) (sinCartas) * 100 / jugadores.size();
+
+        //Si se cumple el minimo de cartas así como el minimo de jugadores
+        return this.personalidadBot.getMinSin() >= porcentajeCartas && this.personalidadBot.getMinMejor() >= porcentajePuntuacion;
+    }
+
     /**
      * Coge todas las cartas actuales de la mesa
      * @param mesa la mesa que se está jugando
@@ -67,7 +94,7 @@ public class JugadorBot extends Jugador {
         //Calculamos la probabilidad que nos salga una carta que nos sirve
         double porcentajeCartaValida = (double) (cartasValidas * 100) / mazo.getCartas().size();
 
-        System.out.printf("a: %.2f b: %d\n", porcentajeCartaValida, cartasValidas);
+        System.out.printf("a= %.2f b= %d c= %d\n", porcentajeCartaValida, cartasValidas, puntosRestantes);
 
         //Comprobamos si nuestro bot se arriesga con la probabilidad dada
         boolean pedirCarta = porcentajeCartaValida >= this.personalidadBot.getRiesgo();

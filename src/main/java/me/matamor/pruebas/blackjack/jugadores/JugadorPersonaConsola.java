@@ -10,6 +10,12 @@ public class JugadorPersonaConsola extends JugadorPersona {
     }
 
     @Override
+    public boolean doblarApuesta(Mesa mesa) {
+        System.out.println("¿ Quieres doblar tu apuesta ?");
+        return Input.leerPregunta();
+    }
+
+    @Override
     public Respuesta jugar(Mesa mesa) {
         System.out.println("¿ Quieres pedir otra carta ?");
         boolean pedirCarta = Input.leerPregunta();
