@@ -7,7 +7,10 @@ import java.util.List;
 public class FileUtils {
 
     public static final String USER_HOME = System.getProperty("user.home");
-    public static final File CARPETA_HOME = new File(USER_HOME + File.separator + "programacion");
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    public static final File CARPETA_HOME = new File(USER_HOME);
+    public static final File CARPETA_PRUEBAS = new File(CARPETA_HOME, "programacion");
 
     public static File getAvailableFolder(File fileContainer, String fileName) {
         String actualName = fileName;
@@ -33,8 +36,14 @@ public class FileUtils {
         return file;
     }
 
+    /**
+     * Borra un archivo, si es una carpeta borra todo su contenido
+     * @param directory la carpeta a borrar
+     * @return true si se borro correctamente
+     */
+
     public static boolean deleteDirectory(File directory) {
-        if (directory.exists() && directory.isDirectory()) {
+        if (directory.isDirectory()) {
             File[] files = directory.listFiles();
             if (files != null){
                 for (File file : files) {
@@ -54,13 +63,15 @@ public class FileUtils {
         return directory.delete();
     }
 
+    /**
+     * Copia un archivo a otro, si es una carpeta copia todo el contenido
+     * @param source la carpeta origen
+     * @param target la carpeta destino
+
+     * @throws IOException si da un error al leer el archivo
+     */
+
     public static void copy(File source, File target) throws IOException {
-        List<String> ignore = Arrays.asList("uid.dat", "session.dat", "chests.yml");
-
-        if (ignore.contains(source.getName())) {
-            return;
-        }
-
         if (source.isDirectory()) {
             if (!target.exists() && !target.exists()) {
                 throw new IOException("Couldn't create target file!");
@@ -77,15 +88,97 @@ public class FileUtils {
                 }
             }
         } else {
-            try (InputStream in = new FileInputStream(source)) {
-                try (OutputStream out = new FileOutputStream(target)) {
-                    byte[] buffer = new byte[1024];
-                    int length;
-                    while ((length = in.read(buffer)) > 0) {
-                        out.write(buffer, 0, length);
+            try (BufferedReader in = new BufferedReader(new FileReader(source))) {
+                try (BufferedWriter out = new BufferedWriter(new FileWriter(target))) {
+                    out.write(in.readLine());
+                }
+            }
+        }
+    }
+
+    /**
+     * Muestra el contenido del file, si es una carpeta muestra todos los archivos recursivamente
+     * @param file el archivo a mostrar
+     * @throws IOException si da un error al leer el archivo
+     */
+
+    public static void printFile(File file) throws IOException {
+        if (file.isFile()) {
+            System.out.println(file.getPath());
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
+            }
+        } else if (file.isDirectory()) {
+            File[] files = file.listFiles();
+
+            if (files != null) {
+                for (File child : files) {
+                    printFile(child);
+                }
+            }
+        }
+    }
+
+    /**
+     * Copia el contenido de todos los archivos al mismo archivo
+     * @param output donde se guardara el contenido de todos los archivos
+     * @param files todos los archivos a copiar
+     * @throws IOException si da un error al leer el archivo
+     */
+
+    public static void concatFiles(File output, File... files) throws IOException {
+        if (files.length > 0) {
+            try (BufferedWriter writer
+                         = new BufferedWriter(new FileWriter(output))) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        try (BufferedReader reader
+                                     = new BufferedReader(new FileReader(file))) {
+                            String line;
+
+                            while ((line = reader.readLine()) != null) {
+                                writer.write(line + FileUtils.LINE_SEPARATOR);
+                            }
+                        }
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Comprueba que ambos archivos tengan el mismo contenido
+     * @param a el primer archivo
+     * @param b el segundo archivo
+     * @return true si ambos archivos contienen el mismo contenido
+     * @throws IOException si da un error al leer el archivo
+     */
+
+    public static boolean equalsFiles(File a, File b) throws IOException {
+        if (!(a.isFile() && b.isFile())) {
+            return false;
+        }
+
+        if (a.length() != b.length()) {
+            return false;
+        }
+
+        try (BufferedReader aInput = new BufferedReader(new FileReader(a));
+             BufferedReader bInput = new BufferedReader(new FileReader(b))) {
+
+            String line;
+            while ((line = aInput.readLine()) != null) {
+                if (!line.equals(bInput.readLine())) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

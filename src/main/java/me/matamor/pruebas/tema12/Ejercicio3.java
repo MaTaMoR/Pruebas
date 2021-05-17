@@ -7,7 +7,7 @@ import java.io.File;
 public class Ejercicio3 {
 
     public static void main(String[] args) {
-        File carpeta = FileUtils.CARPETA_HOME;
+        File carpeta = FileUtils.CARPETA_PRUEBAS;
 
         if (!carpeta.exists()) {
             System.out.println("La carpeta no existe!");

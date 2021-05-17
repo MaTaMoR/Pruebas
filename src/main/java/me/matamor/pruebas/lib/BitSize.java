@@ -1,16 +1,16 @@
 package me.matamor.pruebas.lib;
 
-public enum MemorySize {
+public enum BitSize {
 
-    BIT(MemorySize.BIT_SCALE),
-    BYTE(MemorySize.BYTE_SCALE),
-    KILO_BYTE(MemorySize.KILO_BYTE_SCALE),
-    MEGA_BYTE(MemorySize.MEGA_BYTE_SCALE),
-    GIGA_BYTE(MemorySize.GIGA_BYTE_SCALE);
+    BIT(BitSize.BIT_SCALE),
+    BYTE(BitSize.BYTE_SCALE),
+    KILO_BYTE(BitSize.KILO_BYTE_SCALE),
+    MEGA_BYTE(BitSize.MEGA_BYTE_SCALE),
+    GIGA_BYTE(BitSize.GIGA_BYTE_SCALE);
 
     private final long scale;
 
-    private MemorySize(long scale) {
+    BitSize(long scale) {
         this.scale = scale;
     }
 
@@ -40,8 +40,8 @@ public enum MemorySize {
         return toBits(value) / GIGA_BYTE_SCALE;
     }
 
-    public long convert(long value, MemorySize memorySize) {
-        return memorySize.toBits(value) / this.scale;
+    public long convert(long value, BitSize bitSize) {
+        return bitSize.toBits(value) / this.scale;
     }
 
     private static long safeMulti(long value, long multiplicador) {
