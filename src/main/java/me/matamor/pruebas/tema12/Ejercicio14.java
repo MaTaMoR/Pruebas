@@ -10,33 +10,10 @@ public class Ejercicio14 {
         File file = new File(FileUtils.CARPETA_PRUEBAS, "adios.txt");
         File file2 = new File(FileUtils.CARPETA_PRUEBAS, "adios2.txt");
 
-        System.out.println(equalsFiles(file, file2));
-    }
-
-    public static boolean equalsFiles(File a, File b) {
-        if (!(a.isFile() && b.isFile())) {
-            return false;
-        }
-
-        if (a.length() != b.length()) {
-            return false;
-        }
-
-        try (BufferedReader aInput = new BufferedReader(new FileReader(a));
-                BufferedReader bInput = new BufferedReader(new FileReader(b))) {
-
-            String line;
-            while ((line = aInput.readLine()) != null) {
-                if (!line.equals(bInput.readLine())) {
-                    return false;
-                }
-            }
-
-            return true;
+        try {
+            System.out.println(FileUtils.equalsFiles(file, file2));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return false;
     }
 }
