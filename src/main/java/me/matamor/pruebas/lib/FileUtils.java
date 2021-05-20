@@ -1,6 +1,9 @@
 package me.matamor.pruebas.lib;
 
 import java.io.*;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +40,7 @@ public class FileUtils {
     }
 
     /**
-     * Borra un archivo, si es una carpeta borra todo su contenido
+     * Borra un archivo, si es una carpeta borra su contenido
      * @param directory la carpeta a borrar
      * @return true si se borro correctamente
      */
@@ -64,17 +67,17 @@ public class FileUtils {
     }
 
     /**
-     * Copia un archivo a otro, si es una carpeta copia todo el contenido
+     * Copia un archivo a otro, si es una carpeta copia el contenido
      * @param source la carpeta origen
      * @param target la carpeta destino
 
-     * @throws IOException si da un error al leer el archivo
+     * @throws FileException si da un error al leer el archivo
      */
 
-    public static void copy(File source, File target) throws IOException {
+    public static void copy(File source, File target) throws FileException {
         if (source.isDirectory()) {
             if (!target.exists() && !target.exists()) {
-                throw new IOException("Couldn't create target file!");
+                throw new FileException("Couldn't create target file!");
             }
 
             String[] files = source.list();
@@ -92,6 +95,8 @@ public class FileUtils {
                 try (BufferedWriter out = new BufferedWriter(new FileWriter(target))) {
                     out.write(in.readLine());
                 }
+            } catch (IOException e) {
+                throw new FileException("No se ha podido leer el archivo o escribir el output!");
             }
         }
     }
@@ -99,10 +104,10 @@ public class FileUtils {
     /**
      * Muestra el contenido del file, si es una carpeta muestra todos los archivos recursivamente
      * @param file el archivo a mostrar
-     * @throws IOException si da un error al leer el archivo
+     * @throws FileException si da un error al leer el archivo
      */
 
-    public static void printFile(File file) throws IOException {
+    public static void printFile(File file) throws FileException {
         if (file.isFile()) {
             System.out.println(file.getPath());
 
@@ -112,6 +117,8 @@ public class FileUtils {
                 while ((line = reader.readLine()) != null) {
                     System.out.println(line);
                 }
+            } catch (IOException e) {
+                throw new FileException("No se ha podido leer el archivo!", e);
             }
         } else if (file.isDirectory()) {
             File[] files = file.listFiles();
@@ -128,10 +135,10 @@ public class FileUtils {
      * Copia el contenido de todos los archivos al mismo archivo
      * @param output donde se guardara el contenido de todos los archivos
      * @param files todos los archivos a copiar
-     * @throws IOException si da un error al leer el archivo
+     * @throws FileException si da un error al leer el archivo
      */
 
-    public static void concatFiles(File output, File... files) throws IOException {
+    public static void concatFiles(File output, File... files) throws FileException {
         if (files.length > 0) {
             try (BufferedWriter writer
                          = new BufferedWriter(new FileWriter(output))) {
@@ -147,6 +154,8 @@ public class FileUtils {
                         }
                     }
                 }
+            } catch (IOException e) {
+                throw new FileException("No se ha podido leer los archivos o escribir el output!", e);
             }
         }
     }
@@ -156,11 +165,11 @@ public class FileUtils {
      * @param a el primer archivo
      * @param b el segundo archivo
      * @return true si ambos archivos contienen el mismo contenido
-     * @throws IOException si da un error al leer el archivo
+     * @throws FileException si da un error al leer el archivo
      */
 
-    public static boolean equalsFiles(File a, File b) throws IOException {
-        if (!(a.isFile() && b.isFile())) {
+    public static boolean equalsFiles(File a, File b) throws FileException {
+        if (!a.isFile() || !b.isFile()) {
             return false;
         }
 
@@ -168,17 +177,76 @@ public class FileUtils {
             return false;
         }
 
-        try (BufferedReader aInput = new BufferedReader(new FileReader(a));
-             BufferedReader bInput = new BufferedReader(new FileReader(b))) {
+        try (FileReader aInput = new FileReader(a);
+             FileReader bInput = new FileReader(b)) {
 
-            String line;
-            while ((line = aInput.readLine()) != null) {
-                if (!line.equals(bInput.readLine())) {
+            int input;
+            while ((input = aInput.read()) != -1) {
+                if (input != bInput.read()) {
                     return false;
                 }
             }
 
             return true;
+        } catch (IOException e) {
+            throw new FileException("No se ha podido leer los archivos!", e);
+        }
+    }
+
+    /**
+     * Comprueba que ambos archivos tengan el mismo hash
+     * @param a el primer archivo
+     * @param b el segundo archivo
+     * @return true si ambos archivos contienen el mismo contenido
+     * @throws FileException si da un error al leer el archivo
+     */
+
+    public static boolean equalsFilesHash(File a, File b) throws FileException {
+        if (!a.isFile() || !b.isFile()) {
+            return false;
+        }
+
+        if (a.length() != b.length()) {
+            return false;
+        }
+
+        byte[] hashA = getHash(a);
+        byte[] hashB = getHash(b);
+
+        return Arrays.equals(hashA, hashB);
+    }
+
+    public static byte[] getHash(File file) throws FileException {
+        if (file.isFile()) {
+            try {
+                MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+                try (InputStream inputStream = new FileInputStream(file)) {
+                    int value;
+
+                    while ((value = inputStream.read()) != -1) {
+                        messageDigest.update((byte) value);
+                    }
+                    
+                    return messageDigest.digest();
+                } catch (IOException e) {
+                    throw new FileException("No se ha podido leer el archivo!");
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new FileException("No se puede cargar MD5!");
+            }
+        } else {
+            throw new FileException("No es un archivo valido!");
+        }
+    }
+
+    public static class FileException extends RuntimeException {
+
+        public FileException(String message) {
+            super(message);
+        }
+
+        public FileException(String message, Exception exception) {
+            super(message, exception);
         }
     }
 }

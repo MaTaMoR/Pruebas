@@ -9,6 +9,8 @@ import me.matamor.pruebas.blackjack.jugadores.Jugador;
 import me.matamor.pruebas.blackjack.jugadores.JugadorCPU;
 import me.matamor.pruebas.blackjack.juego.packetmanager.PacketManager;
 import me.matamor.pruebas.blackjack.juego.packetmanager.packets.*;
+import me.matamor.pruebas.blackjack.jugadores.controlador.Controlador;
+import me.matamor.pruebas.blackjack.menu.Juego;
 import me.matamor.pruebas.lib.ThreadUtils;
 
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class Mesa {
 
-    private final PacketManager packetManager;
+    private final Juego juego;
 
     private final Mazo mazo;
     private final JugadorCPU cpu;
@@ -26,8 +28,8 @@ public class Mesa {
     private EstadoMesa estadoMesa;
     private int manos;
 
-    public Mesa(PacketManager packetManager, List<Jugador> jugadores) {
-        this.packetManager = packetManager;
+    public Mesa(Juego juego, List<Jugador> jugadores) {
+        this.juego = juego;
 
         this.mazo = Baraja.nuevoMazo();
         this.cpu = new JugadorCPU();
@@ -38,8 +40,8 @@ public class Mesa {
         this.manos = 0;
     }
 
-    public PacketManager getPacketManager() {
-        return this.packetManager;
+    public Juego getJuego() {
+        return this.juego;
     }
 
     public JugadorCPU getCpu() {
@@ -67,7 +69,20 @@ public class Mesa {
     }
 
     private void broadcast(Packet packet) {
-        this.packetManager.broadcast(this.jugadores, packet);
+        this.juego.getPacketManager().broadcast(this.jugadores, packet);
+    }
+
+    private Controlador.Respuesta jugar(Jugador jugador) {
+        Controlador<? extends Jugador> controlador = this.juego.getRegistroControladores().getControlador(jugador.getClass());
+        if (controlador == null) {
+            throw new IllegalStateException("No hay ningún controlador registrado para el jugador!");
+        }
+
+        return controlador.jugar(jugador, this);
+    }
+
+    private boolean doblarApuesta(Jugador jugador) {
+
     }
     
     public void iniciar() {
@@ -98,7 +113,7 @@ public class Mesa {
 
                 if (puntosJugador < Constantes.PUNTOS_GANAR) { //Si el jugador tiene menos puntos del máximo le preguntamos si quieres seguir jugando
                     if (jugador.getSaldo() >= (jugador.getApuesta() * 2)) { //El jugador se puede permitir doblar la apuesta
-                        boolean doblarApuesta = jugador.doblarApuesta(this);
+                        boolean doblarApuesta = jugador.getControlador().doblarApuesta(this);
 
                         if (doblarApuesta) {
                             jugador.setDoblarApuesta(true);
@@ -106,12 +121,12 @@ public class Mesa {
                         }
                     }
 
-                    Jugador.Respuesta respuesta;
+                    Controlador.Respuesta respuesta;
 
                     do {
-                        respuesta = jugador.jugar(this);
+                        respuesta = jugador.getControlador().jugar(this);
 
-                        if (respuesta == Jugador.Respuesta.PEDIR_CARTA) { //El jugador pide carta así que le damos una más
+                        if (respuesta == Controlador.Respuesta.PEDIR_CARTA) { //El jugador pide carta así que le damos una más
                             broadcast(new PlayerAskCardPacket(jugador));
 
                             Carta carta = this.mazo.sacarCarta();
@@ -121,12 +136,12 @@ public class Mesa {
 
                             broadcast(new PlayerDrawCardPacket(jugador, carta));
                             broadcast(new PlayerPointsPacket(jugador, puntosJugador));
-                        } else if (respuesta == Jugador.Respuesta.SALTAR) { //Si el jugador decide saltar su turno simplemente seguimops
+                        } else if (respuesta == Controlador.Respuesta.SALTAR) { //Si el jugador decide saltar su turno simplemente seguimops
                             broadcast(new PlayerStandPacket(jugador, puntosJugador));
                         }
 
                         ThreadUtils.sleep(Constantes.DELAY);
-                    } while (respuesta == Jugador.Respuesta.PEDIR_CARTA && puntosJugador < Constantes.PUNTOS_GANAR);
+                    } while (respuesta == Controlador.Respuesta.PEDIR_CARTA && puntosJugador < Constantes.PUNTOS_GANAR);
                 }
 
                 if (puntosJugador == Constantes.PUNTOS_GANAR) { //El jugador gana el turno
@@ -187,12 +202,12 @@ public class Mesa {
                 broadcast(new PlayerPointsPacket(this.cpu, puntosCPU));
 
                 if (puntosCPU < Constantes.PUNTOS_GANAR) {
-                    Jugador.Respuesta respuesta;
+                    Controlador.Respuesta respuesta;
 
                     do {
-                        respuesta = this.cpu.jugar(this);
+                        respuesta = this.cpu.getControlador().jugar(this);
 
-                        if (respuesta == Jugador.Respuesta.PEDIR_CARTA) { //El jugador pide carta así que le damos una más
+                        if (respuesta == Controlador.Respuesta.PEDIR_CARTA) { //El jugador pide carta así que le damos una más
                             broadcast(new PlayerAskCardPacket(this.cpu));
                             Carta carta = this.mazo.sacarCarta();
 
@@ -201,10 +216,10 @@ public class Mesa {
 
                             broadcast(new PlayerDrawCardPacket(this.cpu, carta));
                             broadcast(new PlayerPointsPacket(this.cpu, puntosCPU));
-                        } else if (respuesta == Jugador.Respuesta.SALTAR) { //Si el jugador decide saltar su turno simplemente seguimops
+                        } else if (respuesta == Controlador.Respuesta.SALTAR) { //Si el jugador decide saltar su turno simplemente seguimops
                             broadcast(new PlayerStandPacket(this.cpu, puntosCPU));
                         }
-                    } while (respuesta == Jugador.Respuesta.PEDIR_CARTA && puntosCPU < Constantes.PUNTOS_GANAR);
+                    } while (respuesta == Controlador.Respuesta.PEDIR_CARTA && puntosCPU < Constantes.PUNTOS_GANAR);
                 }
 
                 this.estadoMesa = EstadoMesa.DECIDE;

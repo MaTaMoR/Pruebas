@@ -15,21 +15,13 @@ public class Ejercicio10 {
 
         concatLines(output, first, second);
 
-        try {
-            FileUtils.printFile(first);
-            FileUtils.printFile(second);
-            FileUtils.printFile(output);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FileUtils.printFile(first);
+        FileUtils.printFile(second);
+        FileUtils.printFile(output);
     }
 
     public static void concant(File first, File second, File output) {
-        try {
-            FileUtils.concatFiles(output, first, second);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FileUtils.concatFiles(output, first, second);
     }
 
     public static void concatLines(File output, File... files) {

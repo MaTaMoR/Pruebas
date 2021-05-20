@@ -5,16 +5,28 @@ import me.matamor.pruebas.blackjack.jugadores.Jugador;
 import me.matamor.pruebas.blackjack.juego.EstadoMesa;
 import me.matamor.pruebas.blackjack.juego.Mesa;
 import me.matamor.pruebas.blackjack.juego.packetmanager.PacketManager;
+import me.matamor.pruebas.blackjack.jugadores.controlador.RegistroControladores;
 
 import java.util.List;
 
 public class Juego {
 
     private final PacketManager packetManager;
+    private final RegistroControladores registroControladores;
+
     private Mesa mesa;
 
-    public Juego(PacketManager packetManager) {
+    public Juego(PacketManager packetManager, RegistroControladores registroControladores) {
         this.packetManager = packetManager;
+        this.registroControladores = registroControladores;
+    }
+
+    public PacketManager getPacketManager() {
+        return this.packetManager;
+    }
+
+    public RegistroControladores getRegistroControladores() {
+        return this.registroControladores;
     }
 
     public Mesa getMesa() {

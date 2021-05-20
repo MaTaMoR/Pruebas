@@ -3,6 +3,8 @@ package me.matamor.pruebas.blackjack.jugadores;
 import me.matamor.pruebas.blackjack.configuracion.Constantes;
 import me.matamor.pruebas.blackjack.cartas.Mazo;
 import me.matamor.pruebas.blackjack.juego.Mesa;
+import me.matamor.pruebas.blackjack.jugadores.controlador.Controlador;
+import me.matamor.pruebas.blackjack.jugadores.controlador.ControladorBot;
 
 public abstract class Jugador {
 
@@ -75,17 +77,6 @@ public abstract class Jugador {
 
     public void setDoblarApuesta(boolean doblarApuesta) {
         this.doblarApuesta = doblarApuesta;
-    }
-
-    public abstract boolean doblarApuesta(Mesa mesa);
-
-    public abstract Respuesta jugar(Mesa mesa);
-
-    public enum Respuesta {
-
-        SALTAR,
-        PEDIR_CARTA
-
     }
 
     public enum Estado {

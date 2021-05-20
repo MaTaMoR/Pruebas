@@ -10,10 +10,6 @@ public class Ejercicio14 {
         File file = new File(FileUtils.CARPETA_PRUEBAS, "adios.txt");
         File file2 = new File(FileUtils.CARPETA_PRUEBAS, "adios2.txt");
 
-        try {
-            System.out.println(FileUtils.equalsFiles(file, file2));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        System.out.println(FileUtils.equalsFiles(file, file2));
     }
 }

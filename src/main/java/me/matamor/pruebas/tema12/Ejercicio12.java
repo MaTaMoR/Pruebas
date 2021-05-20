@@ -16,7 +16,7 @@ public class Ejercicio12 {
         convertir(new File(FileUtils.CARPETA_PRUEBAS, "dnis.txt"));
     }
 
-    private static void convertir(File file) throws ConversionExcepction {
+    private static void convertir(File file) throws ConversionException {
         if (file.isFile()) {
             List<String> validados = new ArrayList<>();
 
@@ -25,7 +25,7 @@ public class Ejercicio12 {
 
                 while ((line = reader.readLine()) != null) {
                     if (line.length() > VALID_LENGTH) {
-                        throw new ConversionExcepction("Dato invalido: " + line);
+                        throw new ConversionException("Dato invalido: " + line);
                     } else if (line.length() < VALID_LENGTH) {
                         line = "0".repeat(VALID_LENGTH - line.length()) + line;
                     }
@@ -58,19 +58,19 @@ public class Ejercicio12 {
         }
     }
 
-    public static char calcularLetra(String dni) throws ConversionExcepction {
+    public static char calcularLetra(String dni) throws ConversionException {
         try {
             int numero = Integer.parseInt(dni);
             int resto = numero % 23;
 
             return LETRAS[resto];
         } catch (NumberFormatException e) {
-            throw new ConversionExcepction("Invalid number: " + dni);
+            throw new ConversionException("Invalid number: " + dni);
         }
     }
-    public static class ConversionExcepction extends RuntimeException {
+    public static class ConversionException extends RuntimeException {
 
-        public ConversionExcepction(String message) {
+        public ConversionException(String message) {
             super(message);
         }
     }

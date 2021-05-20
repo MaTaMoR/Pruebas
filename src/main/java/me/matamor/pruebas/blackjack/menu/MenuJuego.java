@@ -4,7 +4,6 @@ import me.matamor.pruebas.blackjack.configuracion.Constantes;
 import me.matamor.pruebas.blackjack.exceptions.BlackJackException;
 import me.matamor.pruebas.blackjack.jugadores.Jugador;
 import me.matamor.pruebas.blackjack.jugadores.JugadorBot;
-import me.matamor.pruebas.blackjack.jugadores.JugadorPersonaConsola;
 import me.matamor.pruebas.blackjack.juego.EstadoMesa;
 import me.matamor.pruebas.blackjack.juego.Mesa;
 import me.matamor.pruebas.lib.CancelException;
