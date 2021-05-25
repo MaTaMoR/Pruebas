@@ -1,13 +1,13 @@
 package me.matamor.pruebas.blackjack.jugadores.controlador;
 
+import me.matamor.pruebas.blackjack.cartas.Mazo;
 import me.matamor.pruebas.blackjack.juego.Mesa;
-import me.matamor.pruebas.blackjack.jugadores.Jugador;
 
-public interface Controlador<T extends Jugador> {
+public interface Controlador {
 
-    boolean doblarApuesta(T jugador, Mesa mesa);
+    boolean doblarApuesta(Mazo mazo, Mesa mesa);
 
-    Respuesta jugar(T jugador, Mesa mesa);
+    Respuesta jugar(Mazo mazo, Mesa mesa);
 
     enum Respuesta {
 

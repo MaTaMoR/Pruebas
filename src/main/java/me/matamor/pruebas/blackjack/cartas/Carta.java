@@ -10,10 +10,13 @@ public class Carta {
     private boolean visisble;
 
     public Carta(Palo palo, Tipo tipo) {
+        this(palo, tipo, true);
+    }
+
+    public Carta(Palo palo, Tipo tipo, boolean visisble) {
         this.palo = palo;
         this.tipo = tipo;
-
-        this.visisble = true;
+        this.visisble = visisble;
     }
 
     public Palo getPalo() {

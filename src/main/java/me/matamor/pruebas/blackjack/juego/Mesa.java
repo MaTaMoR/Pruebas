@@ -6,11 +6,9 @@ import me.matamor.pruebas.blackjack.cartas.Mazo;
 import me.matamor.pruebas.blackjack.configuracion.Constantes;
 import me.matamor.pruebas.blackjack.juego.packetmanager.Packet;
 import me.matamor.pruebas.blackjack.jugadores.Jugador;
-import me.matamor.pruebas.blackjack.jugadores.JugadorCPU;
-import me.matamor.pruebas.blackjack.juego.packetmanager.PacketManager;
 import me.matamor.pruebas.blackjack.juego.packetmanager.packets.*;
 import me.matamor.pruebas.blackjack.jugadores.controlador.Controlador;
-import me.matamor.pruebas.blackjack.menu.Juego;
+import me.matamor.pruebas.blackjack.jugadores.controlador.ControladorCPU;
 import me.matamor.pruebas.lib.ThreadUtils;
 
 import java.util.List;
@@ -21,30 +19,52 @@ public class Mesa {
     private final Juego juego;
 
     private final Mazo mazo;
-    private final JugadorCPU cpu;
+    private final Jugador cpu;
 
     private final List<Jugador> jugadores;
 
     private EstadoMesa estadoMesa;
     private int manos;
 
+    private boolean cargada;
+
     public Mesa(Juego juego, List<Jugador> jugadores) {
         this.juego = juego;
 
         this.mazo = Baraja.nuevoMazo();
-        this.cpu = new JugadorCPU();
+
+        this.cpu = new Jugador("CPU", new ControladorCPU());
+        this.cpu.setSaldo(Constantes.SALDO_CPU_DEFAULT);
 
         this.jugadores = jugadores;
 
         this.estadoMesa = EstadoMesa.PARADA;
         this.manos = 0;
+        this.cargada = false;
+    }
+
+    public Mesa(Juego juego, List<Jugador> jugadores, Mazo mazo, Jugador cpu) {
+        this.juego = juego;
+
+        this.mazo = mazo;
+        this.cpu = cpu;
+
+        this.jugadores = jugadores;
+
+        this.estadoMesa = EstadoMesa.PARADA;
+        this.manos = 0;
+        this.cargada = true;
     }
 
     public Juego getJuego() {
         return this.juego;
     }
 
-    public JugadorCPU getCpu() {
+    public Mazo getMazo() {
+        return this.mazo;
+    }
+
+    public Jugador getCpu() {
         return this.cpu;
     }
 
@@ -64,8 +84,16 @@ public class Mesa {
         return this.estadoMesa;
     }
 
+    public void setEstadoMesa(EstadoMesa estadoMesa) {
+        this.estadoMesa = estadoMesa;
+    }
+
     public int getManos() {
         return this.manos;
+    }
+
+    public void setManos(int manos) {
+        this.manos = manos;
     }
 
     private void broadcast(Packet packet) {
@@ -73,27 +101,32 @@ public class Mesa {
     }
 
     private Controlador.Respuesta jugar(Jugador jugador) {
-        Controlador<? extends Jugador> controlador = this.juego.getRegistroControladores().getControlador(jugador.getClass());
-        if (controlador == null) {
-            throw new IllegalStateException("No hay ningún controlador registrado para el jugador!");
-        }
-
-        return controlador.jugar(jugador, this);
+        return jugador.getControlador().jugar(jugador.getMazo(), this);
     }
 
     private boolean doblarApuesta(Jugador jugador) {
-
+        return jugador.getControlador().doblarApuesta(jugador.getMazo(), this);
     }
     
     public void iniciar() {
-        this.manos = 1;
-        this.mazo.mezclar();
-        this.estadoMesa = EstadoMesa.ACTIVA;
+        if (this.cargada) {
+            this.cargada = false;
+        } else {
+            this.manos = 1;
+            this.mazo.mezclar();
+            this.estadoMesa = EstadoMesa.ACTIVA;
 
-        broadcast(new GameStatePacket(this.estadoMesa));
-        ThreadUtils.sleep(Constantes.DELAY);
+            broadcast(new GameStatePacket(this.estadoMesa));
+            ThreadUtils.sleep(Constantes.DELAY);
+        }
 
         do {
+            System.out.println(this.manos);
+            if (this.manos > 0) {
+                this.juego.getGameSave().guardar(this);
+                System.out.println("guardando");
+            }
+
             // Primera juegan los jugadores
             for (Jugador jugador : getJugadores(Jugador.Estado.ACTIVO)) {
                 broadcast(new PlayerTurnStartPacket(jugador)); //Enviamos el mensaje de que empieza el turno del jugador
@@ -113,7 +146,7 @@ public class Mesa {
 
                 if (puntosJugador < Constantes.PUNTOS_GANAR) { //Si el jugador tiene menos puntos del máximo le preguntamos si quieres seguir jugando
                     if (jugador.getSaldo() >= (jugador.getApuesta() * 2)) { //El jugador se puede permitir doblar la apuesta
-                        boolean doblarApuesta = jugador.getControlador().doblarApuesta(this);
+                        boolean doblarApuesta = doblarApuesta(jugador);
 
                         if (doblarApuesta) {
                             jugador.setDoblarApuesta(true);
@@ -124,7 +157,7 @@ public class Mesa {
                     Controlador.Respuesta respuesta;
 
                     do {
-                        respuesta = jugador.getControlador().jugar(this);
+                        respuesta = jugar(jugador);
 
                         if (respuesta == Controlador.Respuesta.PEDIR_CARTA) { //El jugador pide carta así que le damos una más
                             broadcast(new PlayerAskCardPacket(jugador));
@@ -189,7 +222,7 @@ public class Mesa {
                 }
 
                 if (this.cpu.getSaldo() > (this.cpu.getApuesta() * 2)) {
-                    boolean doblarApuesta = this.cpu.doblarApuesta(this);
+                    boolean doblarApuesta = doblarApuesta(this.cpu);
 
                     if (doblarApuesta) {
                         this.cpu.setDoblarApuesta(true);
@@ -205,7 +238,7 @@ public class Mesa {
                     Controlador.Respuesta respuesta;
 
                     do {
-                        respuesta = this.cpu.getControlador().jugar(this);
+                        respuesta = jugar(this.cpu);
 
                         if (respuesta == Controlador.Respuesta.PEDIR_CARTA) { //El jugador pide carta así que le damos una más
                             broadcast(new PlayerAskCardPacket(this.cpu));

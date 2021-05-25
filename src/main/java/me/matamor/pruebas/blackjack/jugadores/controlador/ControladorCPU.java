@@ -1,17 +1,17 @@
 package me.matamor.pruebas.blackjack.jugadores.controlador;
 
+import me.matamor.pruebas.blackjack.cartas.Mazo;
 import me.matamor.pruebas.blackjack.configuracion.Constantes;
 import me.matamor.pruebas.blackjack.juego.Mesa;
 import me.matamor.pruebas.blackjack.jugadores.Jugador;
-import me.matamor.pruebas.blackjack.jugadores.JugadorCPU;
 
 import java.util.List;
 
-public class ControladorCPU implements Controlador<JugadorCPU> {
+public class ControladorCPU implements Controlador {
 
     @Override
-    public boolean doblarApuesta(JugadorCPU jugador, Mesa mesa) {
-        int puntuacion = jugador.getMazo().contarPuntosReal();
+    public boolean doblarApuesta(Mazo mazo, Mesa mesa) {
+        int puntuacion = mazo.contarPuntosReal();
         int sinCartas = 0;
         int mejorPuntuacion = 0;
 
@@ -37,8 +37,8 @@ public class ControladorCPU implements Controlador<JugadorCPU> {
     }
 
     @Override
-    public Controlador.Respuesta jugar(JugadorCPU jugador, Mesa mesa) {
-        int puntosCPU = jugador.getMazo().contarPuntosReal();
+    public Controlador.Respuesta jugar(Mazo mazo, Mesa mesa) {
+        int puntosCPU = mazo.contarPuntosReal();
 
         return (puntosCPU <= Constantes.PEDIR_CARTA_CPU ? Controlador.Respuesta.PEDIR_CARTA : Controlador.Respuesta.SALTAR);
     }

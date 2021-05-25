@@ -31,6 +31,7 @@ public final class Constantes {
     public static final double BONIFICADOR_NORMAL = 1;
 
     public static final int NUEVA_PARTIDA = 1;
-    public static final int ESTADISTICAS = 2;
+    public static final int CARGAR_PARTIDA = 2;
+    public static final int ESTADISTICAS = 3;
 
 }

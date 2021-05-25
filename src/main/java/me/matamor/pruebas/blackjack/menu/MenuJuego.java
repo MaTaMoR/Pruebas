@@ -2,10 +2,12 @@ package me.matamor.pruebas.blackjack.menu;
 
 import me.matamor.pruebas.blackjack.configuracion.Constantes;
 import me.matamor.pruebas.blackjack.exceptions.BlackJackException;
+import me.matamor.pruebas.blackjack.juego.Juego;
 import me.matamor.pruebas.blackjack.jugadores.Jugador;
-import me.matamor.pruebas.blackjack.jugadores.JugadorBot;
 import me.matamor.pruebas.blackjack.juego.EstadoMesa;
 import me.matamor.pruebas.blackjack.juego.Mesa;
+import me.matamor.pruebas.blackjack.jugadores.controlador.ControladorBot;
+import me.matamor.pruebas.blackjack.jugadores.controlador.ControladorConsola;
 import me.matamor.pruebas.lib.CancelException;
 import me.matamor.pruebas.lib.Input;
 import me.matamor.pruebas.lib.ejercicio.MenuConsola;
@@ -24,6 +26,7 @@ public class MenuJuego extends MenuConsola {
         this.juego = juego;
 
         registrarOpcion(Constantes.NUEVA_PARTIDA, new OpcionSimple("Nueva Partida", "Crea una partida nueva!", this::crearPartida));
+        registrarOpcion(Constantes.CARGAR_PARTIDA, new OpcionSimple("Cargar Partida", "Carga una partida guardada", this::cargarPartida));
         registrarOpcion(Constantes.ESTADISTICAS, new OpcionSimple("Mostrar estadisticas", "Muestra las estadisticas de la ultima partida!", this::mostrarEstadisticas));
     }
 
@@ -31,7 +34,7 @@ public class MenuJuego extends MenuConsola {
         System.out.println("Introduce tu nombre:");
         String nombre = Input.leerLinea(Constantes.NAME_MIN, -1);
 
-        return new JugadorPersonaConsola(nombre);
+        return new Jugador(nombre, new ControladorConsola());
     }
 
     private List<Jugador> pedirJugadores() {
@@ -48,7 +51,7 @@ public class MenuJuego extends MenuConsola {
 
                 //Si el jugador es un bot tiene un nombre y apuesta predeterminado
                 if (bot) {
-                    jugador = new JugadorBot("Bot-" + jugadores.size());
+                    jugador = new Jugador("Bot-" + jugadores.size(), new ControladorBot());
                     jugador.setApuesta(Constantes.APUESTA_DEFAULT);
                 } else {
                     //Preguntamos el nombre del jugador
@@ -58,7 +61,7 @@ public class MenuJuego extends MenuConsola {
                     System.out.printf("Introduce la apuesta del jugador (Apuesta minima: %d):\n", Constantes.APUESTA_DEFAULT);
                     int apuesta = Input.leerInt(Constantes.APUESTA_DEFAULT, Constantes.SALDO_DEFAULT);
 
-                    jugador = new JugadorPersonaConsola(nombre);
+                    jugador = new Jugador(nombre, new ControladorConsola());
                     jugador.setApuesta(apuesta);
                 }
 
@@ -107,6 +110,19 @@ public class MenuJuego extends MenuConsola {
             } catch (BlackJackException e) {
                 System.out.println("No se ha podido crear la partida: " + e.getMessage());
             }
+        }
+    }
+
+    private void cargarPartida() {
+        if (this.juego.getGameSave().existe()) {
+            if (this.juego.cargarPartida()) {
+                System.out.println("Partida cargada correctamente!");
+                this.juego.getMesa().iniciar();
+            } else {
+                System.out.println("No se ha podido cargar la partida!");
+            }
+        } else {
+            System.out.println("No hay una partida guardada!");
         }
     }
 

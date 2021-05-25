@@ -7,16 +7,30 @@ import me.matamor.pruebas.blackjack.cartas.Tipo;
 import me.matamor.pruebas.blackjack.configuracion.Constantes;
 import me.matamor.pruebas.blackjack.juego.Mesa;
 import me.matamor.pruebas.blackjack.jugadores.Jugador;
-import me.matamor.pruebas.blackjack.jugadores.JugadorBot;
+import me.matamor.pruebas.blackjack.jugadores.PersonalidadBot;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ControladorBot implements Controlador<JugadorBot> {
+public class ControladorBot implements Controlador {
+
+    private final PersonalidadBot personalidadBot;
+
+    public ControladorBot() {
+        this(PersonalidadBot.aleatorio());
+    }
+
+    public ControladorBot(PersonalidadBot personalidadBot) {
+        this.personalidadBot = personalidadBot;
+    }
+
+    public PersonalidadBot getPersonalidadBot() {
+        return this.personalidadBot;
+    }
 
     @Override
-    public boolean doblarApuesta(JugadorBot jugador, Mesa mesa) {
-        int puntuacion = jugador.getMazo().contarPuntosReal();
+    public boolean doblarApuesta(Mazo mazo, Mesa mesa) {
+        int puntuacion = mazo.contarPuntosReal();
         int sinCartas = 0;
         int mejorPuntuacion = 0;
 
@@ -38,8 +52,8 @@ public class ControladorBot implements Controlador<JugadorBot> {
         double porcentajeCartas = (double) (sinCartas) * 100 / jugadores.size();
 
         //Si se cumple el minimo de cartas así como el minimo de jugadores
-        return jugador.getPersonalidadBot().getMinSin() >= porcentajeCartas &&
-                jugador.getPersonalidadBot().getMinMejor() >= porcentajePuntuacion;
+        return this.personalidadBot.getMinSin() >= porcentajeCartas &&
+                this.personalidadBot.getMinMejor() >= porcentajePuntuacion;
     }
 
     /**
@@ -59,22 +73,22 @@ public class ControladorBot implements Controlador<JugadorBot> {
     }
 
     @Override
-    public Controlador.Respuesta jugar(JugadorBot jugadorBot, Mesa mesa) {
+    public Controlador.Respuesta jugar(Mazo mazo, Mesa mesa) {
         // Contamos nuestros puntos
-        int puntosJugador = jugadorBot.getMazo().contarPuntos();
+        int puntosJugador = mazo.contarPuntos();
 
         //Sacamos todas las cartas que son visibles en la mesa
         List<Carta> cartas = cartasEnMesa(mesa);
 
         //Cogemos todas las que hay en la Baraja
-        Mazo mazo = Baraja.nuevoMazo();
-        cartas.forEach(mazo::quitarCarta);        //Quitamos las cartas que ya hay en la mesa
+        Mazo nuevoMazo = Baraja.nuevoMazo();
+        cartas.forEach(nuevoMazo::quitarCarta);        //Quitamos las cartas que ya hay en la mesa
 
         //Los puntos restantes que nos faltan para ganar
         int puntosRestantes = Constantes.PUNTOS_GANAR - puntosJugador;
 
         //Contamos todas las cartas que quedan por salir que nos sirven
-        int cartasValidas = (int) mazo.getCartas().stream().filter(e -> {
+        int cartasValidas = (int) nuevoMazo.getCartas().stream().filter(e -> {
             if (e.getTipo() == Tipo.AS) {
                 return Constantes.CARTA_AS_MIN <= puntosRestantes;
             } else {
@@ -83,12 +97,12 @@ public class ControladorBot implements Controlador<JugadorBot> {
         }).count();
 
         //Calculamos la probabilidad que nos salga una carta que nos sirve
-        double porcentajeCartaValida = (double) (cartasValidas * 100) / mazo.getCartas().size();
+        double porcentajeCartaValida = (double) (cartasValidas * 100) / nuevoMazo.getCartas().size();
 
         System.out.printf("a= %.2f b= %d c= %d\n", porcentajeCartaValida, cartasValidas, puntosRestantes);
 
         //Comprobamos si nuestro bot se arriesga con la probabilidad dada
-        boolean pedirCarta = porcentajeCartaValida >= jugadorBot.getPersonalidadBot().getRiesgo();
+        boolean pedirCarta = porcentajeCartaValida >= this.personalidadBot.getRiesgo();
 
         //Devolvemos la acción que haría nuestro bot
         return (pedirCarta ? Controlador.Respuesta.PEDIR_CARTA : Controlador.Respuesta.SALTAR);

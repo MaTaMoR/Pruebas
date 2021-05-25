@@ -6,22 +6,29 @@ import me.matamor.pruebas.blackjack.juego.Mesa;
 import me.matamor.pruebas.blackjack.jugadores.controlador.Controlador;
 import me.matamor.pruebas.blackjack.jugadores.controlador.ControladorBot;
 
-public abstract class Jugador {
+public class Jugador {
 
-    protected final String nombre;
-    protected final Mazo mazo;
+    private final String nombre;
+    private final Controlador controlador;
 
-    protected int saldo;
-    protected int apuesta;
+    private Mazo mazo;
 
-    protected int manosGanadas;
+    private int saldo;
+    private int apuesta;
 
-    protected Estado estado;
-    protected boolean doblarApuesta;
+    private int manosGanadas;
 
-    public Jugador(String nombre) {
+    private Estado estado;
+    private boolean doblarApuesta;
+
+    public Jugador(String nombre, Controlador controlador) {
+        this(nombre, controlador, new Mazo());
+    }
+
+    public Jugador(String nombre, Controlador controlador, Mazo mazo) {
         this.nombre = nombre;
-        this.mazo = new Mazo();
+        this.controlador = controlador;
+        this.mazo = mazo;
 
         this.saldo = Constantes.SALDO_DEFAULT;
         this.apuesta = Constantes.APUESTA_DEFAULT;
@@ -35,8 +42,16 @@ public abstract class Jugador {
         return this.nombre;
     }
 
+    public Controlador getControlador() {
+        return this.controlador;
+    }
+
     public Mazo getMazo() {
         return this.mazo;
+    }
+
+    public void setMazo(Mazo mazo) {
+        this.mazo = mazo;
     }
 
     public int getSaldo() {
